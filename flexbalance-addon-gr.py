@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 
 # --- Settings ---
 st.set_page_config(layout="wide")
-st.title("Viohalco Flexibility Monitoring Dashboard")
+st.title("Imbalance Data Monitoring Dashboard")
 
 # --- Sidebar Global Controls ---
 st.sidebar.header("Global Controls")
