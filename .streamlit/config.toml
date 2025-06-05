@@ -1,0 +1,7 @@
+[theme]
+base="light"
+primaryColor="#E1646A"         # A soft blue (used for buttons, sliders)
+backgroundColor="#FAFAFA"      # Background of the main area
+secondaryBackgroundColor="#DCDCDC"  # Sidebar and widget background
+textColor="#1484A0"            # Dark text
+font="sans serif"

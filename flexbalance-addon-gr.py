@@ -10,8 +10,10 @@ st.title("Imbalance Data Monitoring Dashboard")
 
 # --- Sidebar Global Controls ---
 st.sidebar.header("Global Controls")
-selected_date = st.sidebar.date_input("Select Date", datetime.utcnow().date())
-selected_time = st.sidebar.time_input("Select Time", datetime.utcnow().time())
+# selected_date = st.sidebar.date_input("Select Date", datetime.utcnow().date())
+selected_date = datetime.utcnow().date()
+# selected_time = st.sidebar.time_input("Select Time", datetime.utcnow().time())
+selected_time = datetime.utcnow().time()
 site_options = ["All Sites", "Site A", "Site B", "Site C"]
 selected_sites = st.sidebar.multiselect("Select Site(s)", site_options, default=["All Sites"])
 
@@ -24,18 +26,18 @@ now = selected_datetime.replace(minute=0, second=0, microsecond=0)
 if "All Sites" in selected_sites:
     selected_sites = ["Site A", "Site B", "Site C"]
 
-resource_filter = st.sidebar.selectbox("Resource Type", ["All", "Boilers", "Chillers", "Pumps"])
+resource_filter = st.sidebar.selectbox("Resource Type", ["All", "Type A", "Type B", "Type C"])
 show_alerts = st.sidebar.checkbox("Show Alerts", value=True)
 imbalance_threshold = st.sidebar.slider("Imbalance Alert Threshold (MW)", 0, 20, 5)
 
-if st.sidebar.button("Refresh Data"):
-    st.experimental_rerun()
+# if st.sidebar.button("Refresh Data"):
+#     st.experimental_rerun()
 
 st.sidebar.download_button("Download Data", data="", file_name="mock_data.csv", disabled=True)
 
 # --- Generate Synthetic Data ---
 def generate_data(now):
-    index = pd.date_range(now - timedelta(hours=8), now + timedelta(hours=8), freq="15min")
+    index = pd.date_range(now - timedelta(hours=16), now, freq="15min")
     df = pd.DataFrame(index=index)
     df.index.name = "timestamp"
 
@@ -53,7 +55,7 @@ now = selected_datetime.replace(minute=0, second=0, microsecond=0)
 df = generate_data(now)
 
 # --- Tabs ---
-tab1, tab2, tab3 = st.tabs(["Portfolio Overview", "Site-Level Flex", "Market & Schedule"])
+tab1, tab2, tab3 = st.tabs(["Portfolio Overview", "Site-Level Consumption", "Consumption Schedule"])
 
 # --- Tab 1: Portfolio Overview ---
 with tab1:
@@ -83,11 +85,11 @@ with tab2:
     fig2.update_layout(height=400, xaxis_title="Time", yaxis_title="MW")
     st.plotly_chart(fig2, use_container_width=True)
 
-    st.markdown("**Cumulative Balancing Activations**")
-    col1, col2, col3 = st.columns(3)
-    col1.metric("# Activations", int((df["balancing_activations"] > 0).sum()))
-    col2.metric("Energy (MWh)", f"{df["balancing_activations"].sum():.1f}")
-    col3.metric("Avg Price (€/MWh)", f"{df["imbalance_price"].mean():.0f}")
+    # st.markdown("**Cumulative Balancing Activations**")
+    # col1, col2, col3 = st.columns(3)
+    # col1.metric("# Activations", int((df["balancing_activations"] > 0).sum()))
+    # col2.metric("Energy (MWh)", f"{df["balancing_activations"].sum():.1f}")
+    # col3.metric("Avg Price (€/MWh)", f"{df["imbalance_price"].mean():.0f}")
 
 # --- Tab 3: Market & Schedule ---
 with tab3:
