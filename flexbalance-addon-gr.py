@@ -75,20 +75,16 @@ with tab1:
     st.file_uploader("Upload Day-Ahead Schedule", type=["csv", "xlsx"], disabled=True)
     st.write("(Upload disabled in prototype)")
 
-    # check if png image is in current folder
-    try:
-        st.image("Debrief_view_grafana_confidentiall.png")
-    except:
-
-        c1, c2, c3 = st.columns(3)
-        c3.metric("Total scheduled for selected period:", f"{df['scheduled_total'].sum()/4:.1f} MWh")
-        
-        fig3 = go.Figure()
-        for site in selected_sites:
-            fig3.add_trace(go.Scatter(x=df.index, y=df[f"scheduled_{site}"], name=f"Scheduled {site}"))
-        fig3.add_trace(go.Scatter(x=df.index, y=df["scheduled_total"], name="Total Scheduled", line=dict(color="blue", width=2)))
-        fig3.update_layout(height=400, xaxis_title="Time", yaxis_title="MW")
-        st.plotly_chart(fig3, use_container_width=True)
+    c1, c2, c3 = st.columns(3)
+    c3.metric("Total scheduled for selected period:", f"{df['scheduled_total'].sum()/4:.1f} MWh")
+    
+    fig3 = go.Figure()
+    for site in selected_sites:
+        fig3.add_trace(go.Scatter(x=df.index, y=df[f"scheduled_{site}"], name=f"Scheduled {site}"))
+    fig3.add_trace(go.Scatter(x=df.index, y=df["scheduled_total"], name="Total Scheduled", line=dict(color="blue", width=2)))
+    fig3.update_layout(height=400, xaxis_title="Time", yaxis_title="MW", 
+                      title="Scheduled Consumption per PTU")
+    st.plotly_chart(fig3, use_container_width=True)
 
     st.download_button("Download Performance Data", data="", file_name="mock_performance.csv", disabled=True)
     st.write("(Download disabled in prototype)")
@@ -96,13 +92,16 @@ with tab1:
 # --- Tab 2: Portfolio Overview ---
 with tab2:
     st.subheader("Consumption monitoring")
-
-    fig1 = go.Figure()
-    fig1.add_trace(go.Scatter(x=df.index, y=df["scheduled_total"], name="Scheduled", line=dict(color="blue")))
-    fig1.add_trace(go.Scatter(x=df.index, y=df["actual_total"], name="Actual", line=dict(color="red", dash="dot")))
-    fig1.add_vline(x=now, line_width=2, line_dash="dash", line_color="grey")
-    fig1.update_layout(height=400, xaxis_title="Time", yaxis_title="MW")
-    st.plotly_chart(fig1, use_container_width=True)
+        # check if png image is in current folder
+    try:
+        st.image("Debrief_view_grafana_confidential.png")
+    except:
+        fig1 = go.Figure()
+        fig1.add_trace(go.Scatter(x=df.index, y=df["scheduled_total"], name="Scheduled", line=dict(color="blue")))
+        fig1.add_trace(go.Scatter(x=df.index, y=df["actual_total"], name="Actual", line=dict(color="red", dash="dot")))
+        fig1.add_vline(x=now, line_width=2, line_dash="dash", line_color="grey")
+        fig1.update_layout(height=400, xaxis_title="Time", yaxis_title="MW")
+        st.plotly_chart(fig1, use_container_width=True)
 
 
 # --- Tab 3: Site-Level Flex & Imbalance ---
