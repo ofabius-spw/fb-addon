@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
 from datetime import datetime, timedelta
+import streamlit.components.v1 as components
 
 # --- Settings ---
 st.set_page_config(layout="wide")
@@ -60,7 +61,9 @@ tab1, tab2, tab3 = st.tabs(["Portfolio Overview", "Site-Level Consumption", "Con
 
 # --- Tab 1: Portfolio Overview ---
 with tab1:
+
     st.subheader("Aggregated Portfolio Consumption")
+    st.image("Debrief_view_grafana.png")
     df["total_scheduled"] = df[[f"scheduled_{s}" for s in selected_sites]].sum(axis=1)
     df["total_actual"] = df[[f"actual_{s}" for s in selected_sites]].sum(axis=1)
 
