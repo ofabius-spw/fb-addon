@@ -7,7 +7,8 @@ from datetime import datetime, timedelta
 # --- Settings ---
 st.set_page_config(layout="wide")
 st.title("Imbalance Data Monitoring Dashboard")
-
+# st.image(, caption="Optional caption", use_column_width=True)
+st.sidebar.image("https://142257164.fs1.hubspotusercontent-eu1.net/hubfs/142257164/Sympower-Logo-01-2.png")
 # --- Sidebar Global Controls ---
 st.sidebar.header("Global Controls")
 # selected_date = st.sidebar.date_input("Select Date", datetime.utcnow().date())
