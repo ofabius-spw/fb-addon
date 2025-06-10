@@ -77,8 +77,8 @@ with tab1:
 
     # check if png image is in current folder
     try:
-        st.image("DA_Schedule.png")
-    except FileNotFoundError:
+        st.image("Debrief_view_grafana_confidentiall.png")
+    except:
 
         c1, c2, c3 = st.columns(3)
         c3.metric("Total scheduled for selected period:", f"{df['scheduled_total'].sum()/4:.1f} MWh")
@@ -91,7 +91,7 @@ with tab1:
         st.plotly_chart(fig3, use_container_width=True)
 
     st.download_button("Download Performance Data", data="", file_name="mock_performance.csv", disabled=True)
-
+    st.write("(Download disabled in prototype)")
 
 # --- Tab 2: Portfolio Overview ---
 with tab2:
@@ -164,6 +164,10 @@ with tab3:
 
 with tab4:
     st.subheader("Imbalance price")
+    try:
+        st.image("imbalance_price_estimate_confidential.png")
+    except:
+        st.write("Imbalance price estimate is confidential, so this is not shown in the public version.")
 
 
 with tab5:
