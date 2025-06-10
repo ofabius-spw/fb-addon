@@ -63,7 +63,7 @@ tab1, tab2, tab3 = st.tabs(["Portfolio Overview", "Site-Level Consumption", "Con
 with tab1:
 
     st.subheader("Aggregated Portfolio Consumption")
-    st.image("Debrief_view_grafana.png")
+    st.image("Debrief_view_grafana_confidential.png")
     df["total_scheduled"] = df[[f"scheduled_{s}" for s in selected_sites]].sum(axis=1)
     df["total_actual"] = df[[f"actual_{s}" for s in selected_sites]].sum(axis=1)
 
