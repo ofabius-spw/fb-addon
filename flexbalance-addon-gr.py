@@ -18,8 +18,9 @@ selected_date = datetime.utcnow().date()
 selected_time = datetime.utcnow().time()  # Default to current Greek time 
 site_options = ["All Sites", "Site A", "Site B", "Site C"]
 selected_sites = st.sidebar.multiselect("Select Site(s)", site_options, default=["All Sites"])
-(threshold_low, threshold_high) = st.sidebar.slider("Imbalance Cost Alert Threshold (EUR)", -10000, 10000, (-2000, 2000))
 (volume_threshold_low, volume_threshold_high) = st.sidebar.slider("Imbalance Volume Threshold (MW)", -25, 25, (-10, 10))
+(price_threshold_low, price_threshold_high) = st.sidebar.slider("Imbalance Price Alert Threshold (€/MWh)", -400, 1500, (0, 500))
+(cost_threshold_low, cost_threshold_high) = st.sidebar.slider("Imbalance Cost Alert Threshold (€)", -10000, 10000, (-2000, 2000))
 
 # Combine into a full datetime
 selected_datetime = datetime.combine(selected_date, selected_time)+timedelta(hours=3)   # Convert to Greek time (UTC+3, summer) 
@@ -54,12 +55,13 @@ def generate_data(now, selected_sites):
 
     df["actual_total"] = df[[f"actual_{s}" for s in selected_sites]].sum(axis=1)
     df["imbalance_total"] = df[[f"imbalance_{s}" for s in selected_sites]].sum(axis=1)
-    df["imbalance_cost"] = df["imbalance_total"] * df["imbalance_price"]  # Convert to kEUR
+    df["imbalance_cost"] = df["imbalance_total"] * df["imbalance_price"]  # Convert to k€
     df["alerts_volume"] = df[f"imbalance_total"] > volume_threshold_high
     df["alerts_volume"] += df[f"imbalance_total"] < volume_threshold_low
-    df["alerts_cost"] = df["imbalance_cost"] > threshold_high
-    df["alerts_cost"] += df["imbalance_cost"] < threshold_low
-
+    df["alerts_cost"] = df["imbalance_cost"] > cost_threshold_high
+    df["alerts_cost"] += df["imbalance_cost"] < cost_threshold_low
+    df["alerts_price"] = df["imbalance_price"] > price_threshold_high
+    df["alerts_price"] += df["imbalance_price"] < price_threshold_low
     return df
 
 now = selected_datetime.replace(minute=0, second=0, microsecond=0)
@@ -76,7 +78,7 @@ with tab1:
     st.write("(Upload disabled in prototype)")
 
     c1, c2, c3 = st.columns(3)
-    c3.metric("Total scheduled for selected period:", f"{df['scheduled_total'].sum()/4:.1f} MWh")
+    c3.metric("Total scheduled for selected period", f"{df['scheduled_total'].sum()/4:.1f} MWh")
     
     fig3 = go.Figure()
     for site in selected_sites:
@@ -109,7 +111,7 @@ with tab3:
     st.subheader("Imbalance of portfolio")
     # st.metric(, ")
     col1, col2, col3 = st.columns(3)
-    col1.metric("Total imbalance for selected period:", f"{df['imbalance_total'].sum()/4:.1f} MWh")
+    col1.metric("Total imbalance for selected period", f"{df['imbalance_total'].sum()/4:.1f} MWh")
     col2.metric("Positive imbalance PTUs", f"{sum(df['imbalance_total']>0)/len(df)*100:.1f}%" )
     col3.metric("Negative imbalance PTUs", f"{sum(df['imbalance_total']<0)/len(df)*100:.1f}%")
     
@@ -166,13 +168,24 @@ with tab4:
     try:
         st.image("imbalance_price_estimate_confidential.png")
     except:
-        st.write("Imbalance price estimate is confidential, so this is not shown in the public version.")
+        col1, col2, col3 = st.columns(3)
+        col1.metric("Highest price", f"{max(df['imbalance_price']):.0f} €/MWh")
+        col2.metric("Lowest price", f"{min(df['imbalance_price']):.0f} €/MWh" )
+        col3.metric("PTUs with negative prices", f"{sum(df['imbalance_price']<0):.1f}")
+        alert_price_count = df["alerts_price"].sum()
+        st.warning(f"⚠️ {alert_price_count} imbalance price alerts outside thresholds in selected timeframe")
 
+        fig4 = go.Figure()
+        fig4.add_trace(go.Bar(x=df.index, y=df["imbalance_price"], name="Imbalance Price", marker_color="orange", opacity=0.5))
+        fig4.add_vline(x=now, line_width=2, line_dash="dash", line_color="grey")
+        fig4.add_hline(y=price_threshold_low, line_width=2, line_dash="dash", line_color="red", annotation_text="Alert Threshold (high)", annotation_position="top left")
+        fig4.add_hline(y=price_threshold_high, line_width=2, line_dash="dash", line_color="blue", annotation_text="Alert Threshold (high)", annotation_position="top left")
+        st.plotly_chart(fig4, use_container_width=True)
 
 with tab5:
 
     col1, col2, col3 = st.columns(3)
-    col1.metric("Total imbalance costs for selected period:", f"€{df['imbalance_cost'].sum():.0f}", 11350, delta_color='inverse')
+    col1.metric("Total imbalance costs for selected period", f"€{df['imbalance_cost'].sum():.0f}", 11350, delta_color='inverse')
     col2.metric("Most expensive PTU", f"€{df['imbalance_cost'].max():.0f}")
     col3.metric("Most beneficial PTU", f"€{df['imbalance_cost'].min():.0f}")
 
@@ -182,9 +195,9 @@ with tab5:
     st.subheader("Imbalance Costs Per PTU")
     fig5 = go.Figure()
 
-    fig5.add_trace(go.Bar(x=df.index, y=df["imbalance_cost"], name="Imbalance Price", marker_color="orange", opacity=0.5))
+    fig5.add_trace(go.Bar(x=df.index, y=df["imbalance_cost"], name="Imbalance Cost", marker_color="orange", opacity=0.5))
     fig5.add_vline(x=now, line_width=2, line_dash="dash", line_color="grey")
-    fig5.add_hline(y=threshold_low, line_width=2, line_dash="dash", line_color="red", annotation_text="Alert Threshold (high)", annotation_position="top left")
-    fig5.add_hline(y=threshold_high, line_width=2, line_dash="dash", line_color="blue", annotation_text="Alert Threshold (high)", annotation_position="top left")
-    fig5.update_layout(height=400, xaxis_title="Time", yaxis_title="EUR")
+    fig5.add_hline(y=cost_threshold_low, line_width=2, line_dash="dash", line_color="red", annotation_text="Alert Threshold (high)", annotation_position="top left")
+    fig5.add_hline(y=cost_threshold_high, line_width=2, line_dash="dash", line_color="blue", annotation_text="Alert Threshold (high)", annotation_position="top left")
+    fig5.update_layout(height=400, xaxis_title="Time", yaxis_title="€")
     st.plotly_chart(fig5, use_container_width=True)
