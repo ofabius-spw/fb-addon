@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 np.random.seed(41)  # For reproducibility
 # --- Settings ---
 st.set_page_config(layout="wide")
-st.title("Imbalance Data Monitoring Dashboard")
+st.title("Imbalance Monitoring Dashboard")
 # st.image(, caption="Optional caption", use_column_width=True)
 st.sidebar.image("https://142257164.fs1.hubspotusercontent-eu1.net/hubfs/142257164/Sympower-Logo-01-2.png")
 # --- Sidebar Global Controls ---
@@ -88,8 +88,8 @@ with tab1:
                       title="Scheduled Consumption per PTU")
     st.plotly_chart(fig3, use_container_width=True)
 
-    st.download_button("Download Performance Data", data="", file_name="mock_performance.csv", disabled=True)
-    st.write("(Download disabled in prototype)")
+    # st.download_button("Download Performance Data", data="", file_name="mock_performance.csv", disabled=True)
+    # st.write("(Download disabled in prototype)")
 
 # --- Tab 2: Portfolio Overview ---
 with tab2:
@@ -164,7 +164,7 @@ with tab3:
     # col3.metric("Avg Price (€/MWh)", f"{df["imbalance_price"].mean():.0f}")
 
 with tab4:
-    st.subheader("Imbalance price")
+    st.subheader("Imbalance price estimate")
     try:
         st.image("imbalance_price_estimate_confidential.png")
     except:
@@ -176,10 +176,10 @@ with tab4:
         st.warning(f"⚠️ {alert_price_count} imbalance price alerts outside thresholds in selected timeframe")
 
         fig4 = go.Figure()
-        fig4.add_trace(go.Bar(x=df.index, y=df["imbalance_price"], name="Imbalance Price", marker_color="orange", opacity=0.5))
+        fig4.add_trace(go.Bar(x=df.index, y=df["imbalance_price"], name="Estimated Imbalance Price", marker_color="orange", opacity=0.5))
         fig4.add_vline(x=now, line_width=2, line_dash="dash", line_color="grey")
         fig4.add_hline(y=price_threshold_low, line_width=2, line_dash="dash", line_color="red", annotation_text="Alert Threshold (high)", annotation_position="top left")
-        fig4.add_hline(y=price_threshold_high, line_width=2, line_dash="dash", line_color="blue", annotation_text="Alert Threshold (high)", annotation_position="top left")
+        fig4.add_hline(y=price_threshold_high, line_width=2, line_dash="dash", line_color="blue", annotation_text="Alert Threshold (low)", annotation_position="top left")
         st.plotly_chart(fig4, use_container_width=True)
 
 with tab5:
@@ -198,6 +198,6 @@ with tab5:
     fig5.add_trace(go.Bar(x=df.index, y=df["imbalance_cost"], name="Imbalance Cost", marker_color="orange", opacity=0.5))
     fig5.add_vline(x=now, line_width=2, line_dash="dash", line_color="grey")
     fig5.add_hline(y=cost_threshold_low, line_width=2, line_dash="dash", line_color="red", annotation_text="Alert Threshold (high)", annotation_position="top left")
-    fig5.add_hline(y=cost_threshold_high, line_width=2, line_dash="dash", line_color="blue", annotation_text="Alert Threshold (high)", annotation_position="top left")
+    fig5.add_hline(y=cost_threshold_high, line_width=2, line_dash="dash", line_color="blue", annotation_text="Alert Threshold (low)", annotation_position="top left")
     fig5.update_layout(height=400, xaxis_title="Time", yaxis_title="€")
     st.plotly_chart(fig5, use_container_width=True)
