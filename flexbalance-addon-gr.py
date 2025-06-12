@@ -19,7 +19,7 @@ selected_time = datetime.utcnow().time()  # Default to current Greek time
 site_options = ["All Sites", "Site A", "Site B", "Site C"]
 selected_sites = st.sidebar.multiselect("Select Site(s)", site_options, default=["All Sites"])
 (volume_threshold_low, volume_threshold_high) = st.sidebar.slider("Imbalance Volume Threshold (MW)", -25, 25, (-10, 10))
-(price_threshold_low, price_threshold_high) = st.sidebar.slider("Imbalance Price Alert Threshold (€/MWh)", -400, 1500, (0, 500))
+(price_threshold_low, price_threshold_high) = st.sidebar.slider("Estimated Price Alert Threshold (€/MWh)", -400, 1500, (0, 500))
 (cost_threshold_low, cost_threshold_high) = st.sidebar.slider("Imbalance Cost Alert Threshold (€)", -10000, 10000, (-2000, 2000))
 
 # Combine into a full datetime
@@ -68,7 +68,7 @@ now = selected_datetime.replace(minute=0, second=0, microsecond=0)
 df = generate_data(now, selected_sites)
 
 # --- Tabs ---
-tab1, tab2, tab3, tab4, tab5 = st.tabs(["Schedule", "Consumption", "Imbalance position", "Imbalance price", "Imbalance costs" ])
+tab1, tab2, tab3, tab4, tab5 = st.tabs(["Schedule", "Consumption", "Imbalance position", "Price estimate", "Imbalance costs" ])
 
 
 # --- Tab 1: Schedule ---
