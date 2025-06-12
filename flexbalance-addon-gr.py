@@ -185,17 +185,17 @@ with tab4:
 with tab5:
 
     col1, col2, col3 = st.columns(3)
-    col1.metric("Total imbalance costs for selected period", f"€{df['imbalance_cost'].sum():.0f}", 11350, delta_color='inverse')
+    col1.metric("Estimated imbalance costs for selected period", f"€{df['imbalance_cost'].sum():.0f}", 11350, delta_color='inverse')
     col2.metric("Most expensive PTU", f"€{df['imbalance_cost'].max():.0f}")
     col3.metric("Most beneficial PTU", f"€{df['imbalance_cost'].min():.0f}")
 
     alert_cost_count = df["alerts_cost"].sum()
-    st.warning(f"⚠️ {alert_cost_count} imbalance cost alerts outside volume thresholds in selected timeframe")
+    st.warning(f"⚠️ {alert_cost_count} cost alerts outside volume thresholds in selected timeframe")
 
-    st.subheader("Imbalance Costs Per PTU")
+    st.subheader("Estimated Imbalance Costs Per PTU")
     fig5 = go.Figure()
 
-    fig5.add_trace(go.Bar(x=df.index, y=df["imbalance_cost"], name="Imbalance Cost", marker_color="orange", opacity=0.5))
+    fig5.add_trace(go.Bar(x=df.index, y=df["imbalance_cost"], name="Estimated Imbalance Cost", marker_color="orange", opacity=0.5))
     fig5.add_vline(x=now, line_width=2, line_dash="dash", line_color="grey")
     fig5.add_hline(y=cost_threshold_low, line_width=2, line_dash="dash", line_color="red", annotation_text="Alert Threshold (high)", annotation_position="top left")
     fig5.add_hline(y=cost_threshold_high, line_width=2, line_dash="dash", line_color="blue", annotation_text="Alert Threshold (low)", annotation_position="top left")
